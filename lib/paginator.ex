@@ -351,12 +351,19 @@ defmodule Paginator do
          repo,
          repo_opts
        ) do
+    total_count_primary_key_field = total_count_primary_key_field
+    |> is_list()
+    |> case do
+      false -> [total_count_primary_key_field]
+      _ -> total_count_primary_key_field
+    end
+
     result =
       queryable
       |> exclude(:preload)
       |> exclude(:select)
       |> exclude(:order_by)
-      |> select([e], struct(e, [total_count_primary_key_field]))
+      |> select([e], struct(e, total_count_primary_key_field))
       |> subquery
       |> select(count("*"))
       |> repo.one(repo_opts)
@@ -373,13 +380,20 @@ defmodule Paginator do
          repo,
          repo_opts
        ) do
+    total_count_primary_key_field = total_count_primary_key_field
+    |> is_list()
+    |> case do
+      false -> [total_count_primary_key_field]
+      _ -> total_count_primary_key_field
+    end
+    
     result =
       queryable
       |> exclude(:preload)
       |> exclude(:select)
       |> exclude(:order_by)
       |> limit(^(total_count_limit + 1))
-      |> select([e], struct(e, [total_count_primary_key_field]))
+      |> select([e], struct(e, total_count_primary_key_field))
       |> subquery
       |> select(count("*"))
       |> repo.one(repo_opts)
